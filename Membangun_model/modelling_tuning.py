@@ -21,7 +21,7 @@ from sklearn.metrics import (
 
 import mlflow
 import dagshub
-
+import os
 # ===============================
 # Setup DagsHub + MLflow
 # ===============================
@@ -34,9 +34,11 @@ dagshub.init(
 mlflow.set_experiment("Diabetes_Prediction_Fuad")
 
 # ===============================
-# Load Dataset
+# Load Dataset (PATH AMAN)
 # ===============================
-DATA_PATH = "cleaned_pima_diabetes_fuad.csv"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_PATH = os.path.join(BASE_DIR, "cleaned_pima_diabetes_fuad.csv")
+
 df = pd.read_csv(DATA_PATH)
 
 X = df.drop("Outcome", axis=1)
