@@ -94,7 +94,7 @@ f1 = f1_score(y_test, y_pred)
 # ===============================
 # MLflow Logging
 # ===============================
-with mlflow.start_run():
+
 
     # Log params
     for param, value in best_params.items():
