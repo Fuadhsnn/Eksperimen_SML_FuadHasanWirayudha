@@ -1,6 +1,6 @@
-name: diabetes-env
+name: sml-env
 channels:
-  - conda-forge
+  - defaults
 dependencies:
   - python=3.10
   - pip
@@ -11,6 +11,6 @@ dependencies:
       - matplotlib
       - seaborn
       - joblib
-      - optuna
       - mlflow
+      - optuna
       - dagshub
