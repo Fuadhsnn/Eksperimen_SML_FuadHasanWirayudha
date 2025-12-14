@@ -95,17 +95,19 @@ f1 = f1_score(y_test, y_pred)
 # ===============================
 # MLflow Manual Logging
 # ===============================
-with mlflow.start_run():
 
-    # Log parameters
-    for param, value in best_params.items():
-        mlflow.log_param(param, value)
+for param, value in best_params.items():
+    mlflow.log_param(param, value)
 
-    # Log metrics
-    mlflow.log_metric("accuracy", accuracy)
-    mlflow.log_metric("precision", precision)
-    mlflow.log_metric("recall", recall)
-    mlflow.log_metric("f1_score", f1)
+mlflow.log_metric("accuracy", accuracy)
+mlflow.log_metric("precision", precision)
+mlflow.log_metric("recall", recall)
+mlflow.log_metric("f1_score", f1)
+
+mlflow.log_artifact(cm_path)
+mlflow.log_artifact(fi_path)
+mlflow.log_artifact(model_path)
+
 
     # ===============================
     # Confusion Matrix Artifact
