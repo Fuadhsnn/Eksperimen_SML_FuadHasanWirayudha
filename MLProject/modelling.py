@@ -36,8 +36,8 @@ mlflow.set_experiment("Diabetes_Prediction_Fuad")
 # ===============================
 # Load Dataset (PATH AMAN)
 # ===============================
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_PATH = os.path.join(BASE_DIR, "cleaned_pima_diabetes_fuad.csv")
+DATA_PATH = "cleaned_pima_diabetes_fuad.csv"
+
 
 df = pd.read_csv(DATA_PATH)
 
