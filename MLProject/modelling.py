@@ -1,5 +1,5 @@
 # ===============================
-# Modelling & Hyperparameter Tuning (FINAL FIX)
+# Modelling & Hyperparameter Tuning (ANTI RUN NOT FOUND)
 # ===============================
 
 import os
@@ -24,6 +24,14 @@ import mlflow
 import dagshub
 
 # ===============================
+# HARD RESET MLFLOW ENV (INI KUNCI)
+# ===============================
+os.environ.pop("MLFLOW_RUN_ID", None)
+os.environ.pop("MLFLOW_EXPERIMENT_ID", None)
+
+mlflow.end_run()
+
+# ===============================
 # Setup DagsHub + MLflow
 # ===============================
 dagshub.init(
@@ -32,18 +40,13 @@ dagshub.init(
     mlflow=True
 )
 
+mlflow.set_tracking_uri("https://dagshub.com/Fuadhsnn/Eksperimen_SML_FuadHasanWirayudha.mlflow")
 mlflow.set_experiment("Diabetes_Prediction_Fuad")
-
-# Pastikan tidak ada run nyangkut
-mlflow.end_run()
 
 # ===============================
 # Load Dataset
 # ===============================
-DATA_PATH = os.path.join(os.getcwd(), "cleaned_pima_diabetes_fuad.csv")
-
-if not os.path.exists(DATA_PATH):
-    raise FileNotFoundError(f"Dataset tidak ditemukan: {DATA_PATH}")
+DATA_PATH = "cleaned_pima_diabetes_fuad.csv"
 
 df = pd.read_csv(DATA_PATH)
 
@@ -51,11 +54,14 @@ X = df.drop("Outcome", axis=1)
 y = df["Outcome"].astype(int)
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
 )
 
 # ===============================
-# Hyperparameter Tuning with Optuna
+# Optuna Hyperparameter Tuning
 # ===============================
 def objective(trial):
     params = {
@@ -76,8 +82,7 @@ study = optuna.create_study(direction="maximize")
 study.optimize(objective, n_trials=20)
 
 best_params = study.best_params
-best_params["random_state"] = 42
-best_params["n_jobs"] = -1
+best_params.update({"random_state": 42, "n_jobs": -1})
 
 # ===============================
 # Train Final Model
@@ -96,23 +101,22 @@ recall = recall_score(y_test, y_pred)
 f1 = f1_score(y_test, y_pred)
 
 # ===============================
-# MLflow Manual Logging (SAFE)
+# MLflow Logging (SAFE MODE)
 # ===============================
-with mlflow.start_run(run_name="RandomForest_Optuna_Diabetes"):
+with mlflow.start_run(
+    run_name="RandomForest_Optuna_Diabetes",
+    nested=False
+):
 
-    # Log parameters
-    for param, value in best_params.items():
-        mlflow.log_param(param, value)
+    for k, v in best_params.items():
+        mlflow.log_param(k, v)
 
-    # Log metrics
     mlflow.log_metric("accuracy", accuracy)
     mlflow.log_metric("precision", precision)
     mlflow.log_metric("recall", recall)
     mlflow.log_metric("f1_score", f1)
 
-    # ===============================
-    # Confusion Matrix Artifact
-    # ===============================
+    # Confusion Matrix
     cm = confusion_matrix(y_test, y_pred)
 
     plt.figure(figsize=(6, 4))
@@ -122,14 +126,11 @@ with mlflow.start_run(run_name="RandomForest_Optuna_Diabetes"):
     plt.ylabel("Actual")
     plt.tight_layout()
 
-    cm_path = "confusion_matrix.png"
-    plt.savefig(cm_path)
+    plt.savefig("confusion_matrix.png")
     plt.close()
-    mlflow.log_artifact(cm_path)
+    mlflow.log_artifact("confusion_matrix.png")
 
-    # ===============================
-    # Feature Importance Artifact
-    # ===============================
+    # Feature Importance
     fi_df = pd.DataFrame({
         "feature": X.columns,
         "importance": model.feature_importances_
@@ -140,16 +141,12 @@ with mlflow.start_run(run_name="RandomForest_Optuna_Diabetes"):
     plt.title("Feature Importance")
     plt.tight_layout()
 
-    fi_path = "feature_importance.png"
-    plt.savefig(fi_path)
+    plt.savefig("feature_importance.png")
     plt.close()
-    mlflow.log_artifact(fi_path)
+    mlflow.log_artifact("feature_importance.png")
 
-    # ===============================
-    # Save Model Artifact
-    # ===============================
-    model_path = "diabetes_model.pkl"
-    joblib.dump(model, model_path)
-    mlflow.log_artifact(model_path)
+    # Save Model
+    joblib.dump(model, "diabetes_model.pkl")
+    mlflow.log_artifact("diabetes_model.pkl")
 
-print("✅ Training & logging ke MLflow (DagsHub) BERHASIL")
+print("✅ SUCCESS: MLflow logging ke DagsHub BERHASIL TANPA ERROR")
